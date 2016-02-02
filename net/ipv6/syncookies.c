@@ -49,7 +49,9 @@ static inline struct sock *get_cookie_sock(struct sock *sk, struct sk_buff *skb,
 {
 	struct inet_connection_sock *icsk = inet_csk(sk);
 	struct sock *child;
+#ifdef CONFIG_MPTCP
 	int ret;
+#endif
 
 	child = icsk->icsk_af_ops->syn_recv_sock(sk, skb, req, dst);
 
@@ -205,7 +207,7 @@ struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
 	/* check for timestamp cookie support */
 	memset(&tcp_opt, 0, sizeof(tcp_opt));
 	mptcp_init_mp_opt(&mopt);
-	tcp_parse_options(skb, &tcp_opt, &mopt, 0, NULL);
+	tcp_parse_options(skb, &tcp_opt, &mopt, 0, NULL, NULL);
 
 	if (!cookie_timestamp_decode(&tcp_opt))
 		goto out;

@@ -83,9 +83,10 @@ struct tcp_out_options {
 	struct tcp_fastopen_cookie *fastopen_cookie;	/* Fast open cookie */
 #ifdef CONFIG_MPTCP
 	u16	mptcp_options;	/* bit field of MPTCP related OPTION_* */
-	u8	dss_csum:1,
+	u8	dss_csum:1,	/* dss-checksum required? */
 		add_addr_v4:1,
-		add_addr_v6:1;	/* dss-checksum required? */
+		add_addr_v6:1,
+		mptcp_ver:4;
 
 	union {
 		struct {
@@ -103,12 +104,16 @@ struct tcp_out_options {
 	};
 
 	struct {
+		__u64 trunc_mac;
 		struct in_addr addr;
+		u16 port;
 		u8 addr_id;
 	} add_addr4;
 
 	struct {
+		__u64 trunc_mac;
 		struct in6_addr addr;
+		u16 port;
 		u8 addr_id;
 	} add_addr6;
 
@@ -402,9 +407,10 @@ struct tcp_sock {
 		       */
 		mp_killed:1, /* Killed with a tcp_done in mptcp? */
 		was_meta_sk:1,	/* This was a meta sk (in case of reuse) */
-		is_master_sk,
+		is_master_sk:1,
 		close_it:1,	/* Must close socket in mptcp_data_ready? */
-		closing:1;
+		closing:1,
+		mptcp_ver:4;
 	struct mptcp_tcp_sock *mptcp;
 #ifdef CONFIG_MPTCP
 	struct hlist_nulls_node tk_table;
